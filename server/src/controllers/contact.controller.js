@@ -65,8 +65,6 @@ const deleteContact = async (req, res) => {
     const userId = req.user.id;
     const contactId = req.params.id;
 
-    console.log (req.params.id);
-
     const result = await contactService.deleteContactById(userId, contactId);
 
     if (!result) {

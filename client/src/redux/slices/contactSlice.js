@@ -1,11 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../config/axiosInstance";
 
+const getAuthHeaders = () => ({
+  headers: {
+    "x-access-token": localStorage.getItem("token"),
+  },
+});
+
 export const fetchContacts = createAsyncThunk(
   "contacts/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/contacts");
+      const response = await axiosInstance.get(
+        "/contacts",
+        getAuthHeaders()
+      );
       return response.data.contacts || [];
     } catch (error) {
       return rejectWithValue(
@@ -19,7 +28,11 @@ export const createContact = createAsyncThunk(
   "contacts/create",
   async (contactData, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post("/contacts", contactData);
+      const response = await axiosInstance.post(
+        "/contacts",
+        contactData,
+        getAuthHeaders()
+      );
       return response.data.contact;
     } catch (error) {
       return rejectWithValue(
@@ -33,7 +46,11 @@ export const updateContact = createAsyncThunk(
   "contacts/update",
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/contacts/${id}`, data);
+      const response = await axiosInstance.put(
+        `/contacts/${id}`,
+        data,
+        getAuthHeaders()
+      );
       return response.data.contact;
     } catch (error) {
       return rejectWithValue(
@@ -47,7 +64,10 @@ export const deleteContact = createAsyncThunk(
   "contacts/delete",
   async (id, { rejectWithValue }) => {
     try {
-      await axiosInstance.delete(`/contacts/${id}`);
+      await axiosInstance.delete(
+        `/contacts/${id}`,
+        getAuthHeaders()
+      );
       return id;
     } catch (error) {
       return rejectWithValue(
@@ -65,10 +85,7 @@ const initialState = {
   searchTerm: "",
 };
 
-const filterContacts = (
-  contacts,
-  searchTerm,
-) => {
+const filterContacts = (contacts, searchTerm) => {
   let result = [...contacts];
 
   if (searchTerm) {
@@ -91,15 +108,7 @@ const contactSlice = createSlice({
       state.searchTerm = action.payload;
       state.filteredContacts = filterContacts(
         state.contacts,
-        action.payload,
-      );
-    },
-    setSelectedTag: (state, action) => {
-      state.selectedTag = action.payload;
-      state.filteredContacts = filterContacts(
-        state.contacts,
-        state.searchTerm,
-        action.payload,
+        action.payload
       );
     },
     clearFilters: (state) => {
@@ -110,46 +119,43 @@ const contactSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchContacts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.contacts = action.payload;
+        if (!action.payload) return;
+
+        state.contacts = action.payload.contacts;
         state.filteredContacts = filterContacts(
-          action.payload,
-          state.searchTerm,
+          action.payload.contacts,
+          state.searchTerm
         );
       })
       .addCase(createContact.fulfilled, (state, action) => {
-        state.contacts.unshift(action.payload);
+        if (!action.payload) return;
+
+        state.contacts = [action.payload.contact, ...state.contacts];
         state.filteredContacts = filterContacts(
           state.contacts,
-          state.searchTerm,
+          state.searchTerm
         );
       })
-
       .addCase(updateContact.fulfilled, (state, action) => {
         state.contacts = state.contacts.map((c) =>
-          c._id === action.payload._id ? action.payload : c
+          c._id === action.payload.contact._id ? action.payload.contact : c
         );
         state.filteredContacts = filterContacts(
           state.contacts,
-          state.searchTerm,
+          state.searchTerm
         );
       })
-
       .addCase(deleteContact.fulfilled, (state, action) => {
-        state.contacts = state.contacts.filter(
+        state.contacts = state.contacts?.filter(
           (c) => c._id !== action.payload
         );
         state.filteredContacts = filterContacts(
           state.contacts,
-          state.searchTerm,
+          state.searchTerm
         );
-      })
+      });
   },
 });
 
-export const {
-  setSearchTerm,
-  clearFilters,
-} = contactSlice.actions;
-
+export const { setSearchTerm, clearFilters } = contactSlice.actions;
 export default contactSlice.reducer;

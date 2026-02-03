@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 
 app.use ('/auth',userRoutes);
-app.use ('/contact', contactRoutes);
+app.use ('/contacts', contactRoutes);
 
 app.use((err,req,res,next) => {
     const {statusCode = 500 , message = "Something went wrong"} = err;
