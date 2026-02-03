@@ -2,12 +2,14 @@ const express = require("express");
 const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
-const userRoutes = require ('./src/routes/user.routes');
 const {Mongo_DB_URL, PORT} = require('./src/config/db.config');
 const mongoose = require('mongoose');
-// server instance
+
 const http = require("http");
 const server = http.createServer(app);
+
+const userRoutes = require ('./src/routes/user.routes');
+const contactRoutes = require ('./src/routes/contact.routes')
 
 app.use(function (req, res, next) {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -21,9 +23,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 
-app.use('/auth',userRoutes);
+app.use ('/auth',userRoutes);
+app.use ('/contact', contactRoutes);
 
-// Error handling middleware
 app.use((err,req,res,next) => {
     const {statusCode = 500 , message = "Something went wrong"} = err;
     res.status(statusCode).send({
