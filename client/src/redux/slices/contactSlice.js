@@ -109,11 +109,6 @@ const contactSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-
-      .addCase(fetchContacts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(fetchContacts.fulfilled, (state, action) => {
         state.loading = false;
         state.contacts = action.payload;
@@ -122,11 +117,6 @@ const contactSlice = createSlice({
           state.searchTerm,
         );
       })
-      .addCase(fetchContacts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
       .addCase(createContact.fulfilled, (state, action) => {
         state.contacts.unshift(action.payload);
         state.filteredContacts = filterContacts(
@@ -154,16 +144,6 @@ const contactSlice = createSlice({
           state.searchTerm,
         );
       })
-
-      .addCase(toggleFavorite.fulfilled, (state, action) => {
-        state.contacts = state.contacts.map((c) =>
-          c._id === action.payload._id ? action.payload : c
-        );
-        state.filteredContacts = filterContacts(
-          state.contacts,
-          state.searchTerm,
-        );
-      });
   },
 });
 

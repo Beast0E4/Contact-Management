@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   FaPlus,
   FaSearch,
-  FaHeart,
-  FaRegHeart,
   FaEdit,
   FaTrash,
   FaUser,
@@ -15,17 +13,14 @@ import {
   FaStickyNote,
   FaSignOutAlt,
   FaTimes,
-  FaFilter,
-  FaUserCircle,
-  FaStar
+  FaUserCircle
 } from 'react-icons/fa';
 import {
   fetchContacts,
   createContact,
   updateContact,
   deleteContact,
-  setSearchTerm,
-  clearFilters
+  setSearchTerm
 } from '../redux/slices/contactSlice';
 import { logout } from '../redux/slices/authSlice';
 import { validateEmail, validatePhone } from '../utils/validation';
@@ -38,8 +33,6 @@ const Dashboard = () => {
     filteredContacts, 
     loading, 
     searchTerm, 
-    selectedTag, 
-    showFavorites, 
     contacts: allContacts 
   } = useSelector((state) => state.contacts);
 
@@ -60,12 +53,6 @@ const Dashboard = () => {
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
-
-  const allTags = [...new Set(
-    allContacts
-      .flatMap(c => c.tags || [])
-      .filter(tag => tag && tag.trim() !== '')
-  )].sort();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -181,10 +168,6 @@ const Dashboard = () => {
     dispatch(setSearchTerm(e.target.value));
   };
 
-  const handleClearFilters = () => {
-    dispatch(clearFilters());
-  };
-
   const viewContact = (contact) => {
     setViewingContact(contact);
   };
@@ -236,7 +219,6 @@ const Dashboard = () => {
               />
             </div>
 
-
             <button
               onClick={() => openModal()}
               className="btn btn-primary whitespace-nowrap"
@@ -244,50 +226,6 @@ const Dashboard = () => {
               <FaPlus />
               Add Contact
             </button>
-          </div>
-
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <FaFilter />
-              Filters:
-            </span>
-            
-            <button
-              onClick={handleFavoriteFilter}
-              className={`badge ${
-                showFavorites
-                  ? 'bg-red-100 text-red-700 border-red-300'
-                  : 'bg-gray-100 text-gray-700 border-gray-300'
-              } border px-3 py-1.5 cursor-pointer hover:shadow-md transition-all`}
-            >
-              {showFavorites ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
-              Favorites {showFavorites && `(${filteredContacts.length})`}
-            </button>
-
-            {allTags.map(tag => (
-              <button
-                key={tag}
-                onClick={() => handleTagFilter(tag)}
-                className={`badge ${
-                  selectedTag === tag
-                    ? 'bg-blue-100 text-blue-700 border-blue-300'
-                    : 'bg-gray-100 text-gray-700 border-gray-300'
-                } border px-3 py-1.5 cursor-pointer hover:shadow-md transition-all`}
-              >
-                <FaTag className="text-xs" />
-                {tag}
-              </button>
-            ))}
-
-            {(searchTerm || selectedTag || showFavorites) && (
-              <button
-                onClick={handleClearFilters}
-                className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
-              >
-                <FaTimes />
-                Clear All
-              </button>
-            )}
           </div>
 
           <div className="text-sm text-gray-600">
@@ -305,11 +243,11 @@ const Dashboard = () => {
             <FaUser className="text-gray-300 text-6xl mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No Contacts Found</h3>
             <p className="text-gray-500 mb-6">
-              {searchTerm || selectedTag || showFavorites
-                ? 'Try adjusting your filters'
+              {searchTerm 
+                ? 'No matches found for your search'
                 : 'Get started by adding your first contact'}
             </p>
-            {!searchTerm && !selectedTag && !showFavorites && (
+            {!searchTerm && (
               <button onClick={() => openModal()} className="btn btn-primary">
                 <FaPlus />
                 Add Your First Contact
@@ -334,9 +272,6 @@ const Dashboard = () => {
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
                         {contact.name}
-                        {contact.isFavorite && (
-                          <FaStar className="text-yellow-500 text-sm" />
-                        )}
                       </h3>
                     </div>
                   </div>
@@ -533,7 +468,6 @@ const Dashboard = () => {
               </div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 {viewingContact.name}
-                {viewingContact.isFavorite && <FaStar className="text-yellow-300" />}
               </h2>
             </div>
 

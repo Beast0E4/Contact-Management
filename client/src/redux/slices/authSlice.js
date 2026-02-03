@@ -5,7 +5,7 @@ export const loginUser = createAsyncThunk(
   "auth/login",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post("/auth/login", {
+      const response = await axiosInstance.post("/auth/signin", {
         email,
         password,
       });
@@ -34,11 +34,9 @@ export const registerUser = createAsyncThunk(
 
 
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null,
+  data: JSON.parse(localStorage.getItem("user")) || null,
   token: localStorage.getItem("token") || null,
-  loading: false,
-  error: null,
-  isAuthenticated: !!localStorage.getItem("token"),
+  isLoggedIn: !!localStorage.getItem("token"),
 };
 
 
@@ -48,52 +46,28 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      localStorage.removeItem("data");
 
-      state.user = null;
+      state.data = null;
       state.token = null;
-      state.isAuthenticated = false;
-    },
-    clearError: (state) => {
-      state.error = null;
+      state.isLoggedIn = false;
     },
   },
   extraReducers: (builder) => {
     builder
-
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
+        if (!action.payload) return;
+
+        state.data = action.payload.userData;
         state.token = action.payload.token;
-        state.isAuthenticated = true;
+        state.isLoogedIn = true;
 
         localStorage.setItem("token", action.payload.token);
         localStorage.setItem(
-          "user",
-          JSON.stringify(action.payload.user)
+          "data",
+          JSON.stringify(action.payload.userData)
         );
       })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.isAuthenticated = false;
-      })
-
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
   },
 });
 
