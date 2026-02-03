@@ -1,6 +1,16 @@
 const Joi = require('joi');
 
 module.exports.userSchema = Joi.object({
+    name: Joi.string()
+        .required()
+        .pattern(new RegExp("^[A-Za-z ]+$"))
+        .messages({
+            "string.base": "Name must be a text value.",
+            "string.empty": "Name cannot be empty.",
+            "any.required": "Name is required.",
+            "string.pattern.base": "Name can only contain characters and spaces."
+        }),
+
     email: Joi.string()
         .email()
         .required()
