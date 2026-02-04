@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
+import { FaSignOutAlt } from 'react-icons/fa';
 
 const Navbar = ({ user, onLogout }) => {
   return (
@@ -11,7 +11,7 @@ const Navbar = ({ user, onLogout }) => {
               <img src='/contact-us.png' className="text-white text-2xl" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Contact Manager</h1>
+              <h1 className="text-xl font-bold text-gray-900">Contact Dashboard</h1>
               <p className="text-sm text-gray-600">Welcome, {user?.name || 'User'}</p>
             </div>
           </div>
