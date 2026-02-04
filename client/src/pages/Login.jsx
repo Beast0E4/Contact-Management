@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaEnvelope, FaLock, FaUserCircle } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaUserCircle, FaChevronRight } from 'react-icons/fa';
 import { loginUser } from '../redux/slices/authSlice';
 import { validateEmail } from '../utils/validation';
 
@@ -10,7 +10,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.auth);
+  const { loading, error: serverError } = useSelector((state) => state.auth);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,61 +42,91 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#f8fafc] py-12">
       <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
-            <FaUserCircle className="text-white text-3xl" />
+        {/* Header Section */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] mb-6 shadow-2xl shadow-blue-200 -rotate-3 hover:rotate-0 transition-transform duration-300">
+            <FaUserCircle className="text-white text-4xl" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Sign in to manage your contacts</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight">Welcome Back</h1>
+          <p className="text-gray-400 mt-2 font-medium">Access your professional contact directory</p>
         </div>
 
-        <div className="card p-8">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 p-10 border border-gray-100">
+          {/* Server Side Errors */}
+          {serverError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-[11px] font-black uppercase tracking-widest rounded-2xl text-center">
+              {serverError}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FaEnvelope className="inline mr-2" />
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-1">
                 Email Address
               </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`input ${errors.email ? 'border-red-500' : ''}`}
-                placeholder="your@email.com"
-              />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              <div className="relative">
+                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="name@company.com"
+                  className={`w-full pl-11 pr-4 py-4 bg-gray-50 border rounded-2xl outline-none focus:ring-4 transition-all ${
+                    errors.email ? 'border-red-500 focus:ring-red-50' : 'border-transparent focus:ring-blue-50 focus:bg-white focus:border-blue-500'
+                  }`}
+                />
+              </div>
+              {errors.email && <p className="text-red-500 text-[10px] font-bold mt-2 px-1 uppercase italic">{errors.email}</p>}
             </div>
 
+            {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FaLock className="inline mr-2" />
-                Password
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-1">
+                Security Password
               </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`input ${errors.password ? 'border-red-500' : ''}`}
-                placeholder="••••••••"
-              />
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              <div className="relative">
+                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className={`w-full pl-11 pr-4 py-4 bg-gray-50 border rounded-2xl outline-none focus:ring-4 transition-all ${
+                    errors.password ? 'border-red-500 focus:ring-red-50' : 'border-transparent focus:ring-blue-50 focus:bg-white focus:border-blue-500'
+                  }`}
+                />
+              </div>
+              {errors.password && <p className="text-red-500 text-[10px] font-bold mt-2 px-1 uppercase italic">{errors.password}</p>}
             </div>
 
-            <button type="submit" disabled={loading} className="btn btn-primary w-full">
-              {loading ? 'Signing In...' : 'Sign In'}
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-xl shadow-blue-200 transition-all disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-2 mt-4"
+            >
+              {loading ? 'Authenticating...' : (
+                <>
+                  Sign In <FaChevronRight size={10} />
+                </>
+              )}
             </button>
           </form>
 
-          <p className="text-center text-gray-600 mt-6">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-              Sign Up
-            </Link>
-          </p>
+          {/* Footer Link */}
+          <div className="text-center mt-10">
+            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest">
+              New to the platform?{' '}
+              <Link to="/register" className="text-blue-600 hover:text-blue-700 ml-1">
+                Create Account
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

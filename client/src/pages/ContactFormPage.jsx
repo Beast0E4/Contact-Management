@@ -3,10 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createContact, updateContact } from '../redux/slices/contactSlice';
 import { 
-  FaUser, FaEnvelope, FaPhone, FaTag, 
-  FaStickyNote, FaArrowLeft, FaSave 
+  FaUser, FaEnvelope, FaTag, 
+  FaStickyNote, FaArrowLeft, FaSave, FaBuilding 
 } from 'react-icons/fa';
-import { validateEmail, validatePhone } from '../utils/validation';
+import { validateEmail } from '../utils/validation';
+
+// Phone Input Library & Styles
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 const ContactFormPage = () => {
   const { id } = useParams();
@@ -19,6 +23,7 @@ const ContactFormPage = () => {
     name: '',
     email: '',
     phone: '',
+    company: '',
     tags: '',
     notes: ''
   });
@@ -32,6 +37,7 @@ const ContactFormPage = () => {
           name: contact.name || '',
           email: contact.email || '',
           phone: contact.phone || '',
+          company: contact.company || '',
           notes: contact.notes || '',
           tags: Array.isArray(contact.tags) ? contact.tags.join(', ') : ''
         });
@@ -45,12 +51,18 @@ const ContactFormPage = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
+  const handlePhoneChange = (value) => {
+    setFormData({ ...formData, phone: value });
+    setErrors({ ...errors, phone: '' });
+  };
+
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (formData.email && !validateEmail(formData.email)) newErrors.email = 'Invalid email format';
-    if (formData.phone && !validatePhone(formData.phone)) newErrors.phone = 'Invalid phone format';
-    if (!formData.email && !formData.phone) {
+    if (formData.phone && formData.phone.length < 8) newErrors.phone = 'Phone number is too short';
+    
+    if (!formData.email && (!formData.phone || formData.phone.length < 5)) {
       newErrors.email = 'Provide at least email or phone';
       newErrors.phone = 'Provide at least email or phone';
     }
@@ -65,7 +77,6 @@ const ContactFormPage = () => {
       return;
     }
 
-    // Process tags from string to array
     const contactData = {
       ...formData,
       tags: formData.tags
@@ -83,118 +94,162 @@ const ContactFormPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-xl mx-auto px-4">
+    <div className="min-h-screen bg-[#f8fafc] py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Back Button */}
         <button 
           onClick={() => navigate('/dashboard')} 
-          className="flex items-center text-gray-600 mb-6 hover:text-blue-600 transition-colors"
+          className="group flex items-center text-gray-400 mb-8 hover:text-blue-600 transition-all font-bold text-sm uppercase tracking-widest"
         >
-          <FaArrowLeft className="mr-2" /> Back to Dashboard
+          <FaArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" /> 
+          Back to Directory
         </button>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            {isEditing ? 'Update Contact' : 'Add New Contact'}
-          </h2>
+        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-gray-100 p-8 md:p-12">
+          <header className="mb-10">
+            <h2 className="text-4xl font-black text-gray-900 tracking-tight">
+              {isEditing ? 'Edit Profile' : 'New Contact'}
+            </h2>
+            <p className="text-gray-400 mt-2 font-medium">Enter the details below to maintain your network.</p>
+          </header>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                <FaUser className="inline mr-2 text-gray-400" /> Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="John Doe"
-                className={`w-full p-3 border rounded-xl outline-none focus:ring-2 transition-all ${
-                  errors.name ? 'border-red-500 focus:ring-red-100' : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
-                }`}
-              />
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+          <form onSubmit={handleSubmit} className="space-y-7">
+            
+            {/* Name & Company Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label text="Full Name" required />
+                <div className="relative">
+                  <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="E.g. Alex Rivera"
+                    className={`w-full pl-11 pr-4 py-4 bg-gray-50 border rounded-2xl outline-none focus:ring-4 transition-all ${
+                      errors.name ? 'border-red-500 focus:ring-red-50' : 'border-transparent focus:ring-blue-50 focus:bg-white focus:border-blue-500'
+                    }`}
+                  />
+                </div>
+                {errors.name && <ErrorMsg msg={errors.name} />}
+              </div>
+
+              <div>
+                <Label text="Company" />
+                <div className="relative">
+                  <FaBuilding className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <input
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    placeholder="E.g. Global Tech"
+                    className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-500 transition-all"
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Email */}
+            {/* Email Address */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                <FaEnvelope className="inline mr-2 text-gray-400" /> Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="john@example.com"
-                className={`w-full p-3 border rounded-xl outline-none focus:ring-2 transition-all ${
-                  errors.email ? 'border-red-500 focus:ring-red-100' : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
-                }`}
-              />
+              <Label text="Email Address" />
+              <div className="relative">
+                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="alex@company.com"
+                  className={`w-full pl-11 pr-4 py-4 bg-gray-50 border rounded-2xl outline-none focus:ring-4 transition-all ${
+                    errors.email ? 'border-red-500 focus:ring-red-50' : 'border-transparent focus:ring-blue-50 focus:bg-white focus:border-blue-500'
+                  }`}
+                />
+              </div>
+              {errors.email && <ErrorMsg msg={errors.email} />}
             </div>
 
-            {/* Phone */}
+            {/* Phone with Searchable Country */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                <FaPhone className="inline mr-2 text-gray-400" /> Phone
-              </label>
-              <input
-                type="tel"
-                name="phone"
+              <Label text="Phone Number" />
+              <PhoneInput
+                country={'us'}
                 value={formData.phone}
-                onChange={handleChange}
-                placeholder="+1 (555) 123-4567"
-                className={`w-full p-3 border rounded-xl outline-none focus:ring-2 transition-all ${
-                  errors.phone ? 'border-red-500 focus:ring-red-100' : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
-                }`}
+                onChange={handlePhoneChange}
+                enableSearch={true}
+                searchPlaceholder="Find your country..."
+                inputStyle={{
+                  width: '100%',
+                  height: '60px',
+                  borderRadius: '1.25rem',
+                  border: 'none',
+                  backgroundColor: '#f9fafb',
+                  fontSize: '1rem',
+                  fontWeight: '500'
+                }}
+                containerClass="premium-phone"
+                buttonStyle={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderRadius: '1.25rem 0 0 1.25rem',
+                  paddingLeft: '10px'
+                }}
+                dropdownStyle={{
+                  borderRadius: '1rem',
+                  boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+                }}
               />
+              {errors.phone && <ErrorMsg msg={errors.phone} />}
             </div>
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                <FaTag className="inline mr-2 text-gray-400" /> Tags (comma separated)
-              </label>
-              <input
-                type="text"
-                name="tags"
-                value={formData.tags}
-                onChange={handleChange}
-                placeholder="work, family, friends"
-                className="w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
-              />
-              <p className="text-xs text-gray-400 mt-1 italic">Example: work, family, friends</p>
+              <Label text="Tags (comma separated)" />
+              <div className="relative">
+                <FaTag className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                <input
+                  type="text"
+                  name="tags"
+                  value={formData.tags}
+                  onChange={handleChange}
+                  placeholder="Work, Family, High Priority"
+                  className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-500 transition-all"
+                />
+              </div>
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                <FaStickyNote className="inline mr-2 text-gray-400" /> Notes
-              </label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                rows="3"
-                placeholder="Additional notes..."
-                className="w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all resize-none"
-              />
+              <Label text="Internal Notes" />
+              <div className="relative">
+                <FaStickyNote className="absolute left-4 top-5 text-gray-300" />
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows="4"
+                  placeholder="Write a brief description..."
+                  className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-500 transition-all resize-none"
+                />
+              </div>
             </div>
 
-            <div className="pt-4 flex gap-3">
+            {/* Actions */}
+            <div className="pt-8 flex flex-col sm:flex-row gap-4">
               <button
                 type="button"
                 onClick={() => navigate('/dashboard')}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-all"
+                className="flex-1 py-4 bg-gray-100 text-gray-500 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-gray-200 transition-all"
               >
-                Cancel
+                Discard Changes
               </button>
               <button
                 type="submit"
-                className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2"
+                className="flex-[2] py-4 bg-blue-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
               >
-                <FaSave />
-                {isEditing ? 'Save Changes' : 'Add Contact'}
+                <FaSave size={14} />
+                {isEditing ? 'Update Contact' : 'Save Contact'}
               </button>
             </div>
           </form>
@@ -203,5 +258,18 @@ const ContactFormPage = () => {
     </div>
   );
 };
+
+// Simple helper components for clean code
+const Label = ({ text, required }) => (
+  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-1">
+    {text} {required && <span className="text-red-500">*</span>}
+  </label>
+);
+
+const ErrorMsg = ({ msg }) => (
+  <p className="text-red-500 text-[10px] font-bold mt-2 px-1 uppercase tracking-tight italic">
+    {msg}
+  </p>
+);
 
 export default ContactFormPage;

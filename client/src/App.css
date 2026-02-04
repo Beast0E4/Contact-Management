@@ -1,0 +1,25 @@
+/* Phone Input Search Bar Styling */
+.premium-phone .search-box {
+  width: 90% !important;
+  margin: 12px auto !important;
+  padding: 10px 15px !important;
+  border-radius: 12px !important;
+  background: #f3f4f6 !important;
+  border: 1px solid #e5e7eb !important;
+  outline: none !important;
+}
+
+.premium-phone .country-list {
+  border-radius: 1.25rem !important;
+  padding: 8px 0 !important;
+}
+
+.premium-phone .country {
+  padding: 10px 15px !important;
+  font-size: 14px !important;
+  transition: background 0.2s;
+}
+
+.premium-phone .country:hover {
+  background-color: #eff6ff !important;
+}

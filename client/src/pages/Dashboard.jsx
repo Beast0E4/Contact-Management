@@ -6,9 +6,9 @@ import { logout } from '../redux/slices/authSlice';
 
 import Navbar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
-import ContactTable from '../components/ContactTable';
 import ViewModal from '../components/ViewModal';
 import DeleteModal from '../components/DeleteModal';
+import ContactCardGrid from '../components/ContactCardGrid';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -46,7 +46,7 @@ const Dashboard = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           </div>
         ) : (
-          <ContactTable 
+          <ContactCardGrid
             contacts={filteredContacts} 
             onView={setViewingContact} 
             onEdit={(id) => navigate(`/contacts/edit/${id}`)}
