@@ -11,6 +11,7 @@ import { validateEmail } from '../utils/validation';
 // Phone Input Library & Styles
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import toast from 'react-hot-toast';
 
 const ContactFormPage = () => {
   const { id } = useParams();
@@ -58,14 +59,13 @@ const ContactFormPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    if (!formData.name.trim() || !formData.phone) {
+      toast.error ('All marked fields are required');
+      newErrors.common = 'All marked fields are required';
+    }
     if (formData.email && !validateEmail(formData.email)) newErrors.email = 'Invalid email format';
     if (formData.phone && formData.phone.length < 8) newErrors.phone = 'Phone number is too short';
-    
-    if (!formData.email && (!formData.phone || formData.phone.length < 5)) {
-      newErrors.email = 'Provide at least email or phone';
-      newErrors.phone = 'Provide at least email or phone';
-    }
+
     return newErrors;
   };
 
@@ -124,6 +124,7 @@ const ContactFormPage = () => {
                   <input
                     type="text"
                     name="name"
+                    required
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="E.g. Alex Rivera"
@@ -153,12 +154,13 @@ const ContactFormPage = () => {
 
             {/* Email Address */}
             <div>
-              <Label text="Email Address" />
+              <Label text="Email Address" required/>
               <div className="relative">
                 <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
                 <input
                   type="email"
                   name="email"
+                  required
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="alex@company.com"
@@ -172,18 +174,26 @@ const ContactFormPage = () => {
 
             {/* Phone with Searchable Country */}
             <div>
-              <Label text="Phone Number" />
+              <Label text="Phone Number" required />
               <PhoneInput
                 country={'us'}
                 value={formData.phone}
                 onChange={handlePhoneChange}
                 enableSearch={true}
                 searchPlaceholder="Find your country..."
+                
+                // ADD THIS: Passes the required attribute to the internal input
+                inputProps={{
+                  name: 'phone',
+                  required: true,
+                  autoFocus: false
+                }}
+
                 inputStyle={{
                   width: '100%',
                   height: '60px',
                   borderRadius: '1.25rem',
-                  border: 'none',
+                  border: errors.phone ? '2px solid #ef4444' : 'none', // Subtle red border if error
                   backgroundColor: '#f9fafb',
                   fontSize: '1rem',
                   fontWeight: '500'

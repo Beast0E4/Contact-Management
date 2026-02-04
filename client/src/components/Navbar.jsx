@@ -7,8 +7,8 @@ const Navbar = ({ user, onLogout }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-              <FaUserCircle className="text-white text-2xl" />
+            <div className="w-10 h-10  flex items-center justify-center">
+              <img src='/contact-us.png' className="text-white text-2xl" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">Contact Manager</h1>

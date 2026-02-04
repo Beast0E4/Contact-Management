@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../config/axiosInstance";
+import toast from "react-hot-toast";
 
 const getAuthHeaders = () => ({
   headers: {
@@ -17,6 +18,7 @@ export const fetchContacts = createAsyncThunk(
       );
       return response.data.contacts || [];
     } catch (error) {
+      toast.error (error.response?.data?.error || "Failed to fetch contacts")
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch contacts"
       );
@@ -35,6 +37,7 @@ export const createContact = createAsyncThunk(
       );
       return response.data.contact;
     } catch (error) {
+      toast.error (error.response?.data?.error || "Failed to create contact")
       return rejectWithValue(
         error.response?.data?.message || "Failed to create contact"
       );
@@ -53,6 +56,7 @@ export const updateContact = createAsyncThunk(
       );
       return response.data.contact;
     } catch (error) {
+      toast.error (error.response?.data?.error || "Failed to update contact")
       return rejectWithValue(
         error.response?.data?.message || "Failed to update contact"
       );
@@ -70,6 +74,7 @@ export const deleteContact = createAsyncThunk(
       );
       return id;
     } catch (error) {
+      toast.error (error.response?.data?.error || "Failed to delete contact")
       return rejectWithValue(
         error.response?.data?.message || "Failed to delete contact"
       );

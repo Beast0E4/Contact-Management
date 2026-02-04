@@ -39,7 +39,7 @@ const validateUser = async (email, password) => {
         let res = await User.findOne({ email });
 
         if (!res) {
-            response.error = "Invalid username or email";
+            response.error = "Invalid email";
             return response;
         }
 

@@ -23,7 +23,7 @@ const Login = () => {
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!validateEmail(formData.email)) newErrors.email = 'Invalid email';
     if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 6) newErrors.password = 'Min 6 characters';
+    else if (formData.password.length < 6) newErrors.password = 'Min 8 characters';
     return newErrors;
   };
 
