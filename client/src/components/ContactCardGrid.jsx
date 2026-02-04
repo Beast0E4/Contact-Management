@@ -59,7 +59,7 @@ const ContactCardGrid = ({ contacts, onView, onEdit, onDelete }) => {
                   : 'bg-white text-gray-500 border-gray-100 hover:border-blue-300 hover:text-blue-500'
                 }`}
               >
-                {tag}
+                {tag.toUpperCase ()}
               </button>
             ))}
           </div>
