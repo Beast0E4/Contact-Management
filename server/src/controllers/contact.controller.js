@@ -1,3 +1,4 @@
+const { StatusCodes } = require('http-status-codes');
 const contactService = require('../services/contact.service');
 
 const getAllContacts = async (req, res) => {
@@ -5,12 +6,12 @@ const getAllContacts = async (req, res) => {
     const userId = req.user.id; 
     const contacts = await contactService.findAllContacts(userId);
     
-    res.status(200).json({ 
+    res.status(StatusCodes.OK).json({ 
       success: true, 
       contacts 
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(StatusCodes.BAD_REQUEST).json({ 
       success: false, 
       message: error.message 
     });
@@ -24,12 +25,12 @@ const createContact = async (req, res) => {
     
     const newContact = await contactService.createNewContact(userId, contactData);
     
-    res.status(201).json({ 
+    res.status(StatusCodes.OK).json({ 
       success: true, 
       contact: newContact 
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(StatusCodes.BAD_REQUEST).json({ 
       success: false, 
       message: error.message 
     });
@@ -45,15 +46,15 @@ const updateContact = async (req, res) => {
     const updatedContact = await contactService.updateContactById(userId, contactId, updateData);
 
     if (!updatedContact) {
-      return res.status(404).json({ message: "Contact not found" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: "Contact not found" });
     }
 
-    res.status(200).json({ 
+    res.status(StatusCodes.OK).json({ 
       success: true, 
       contact: updatedContact 
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(StatusCodes.BAD_REQUEST).json({ 
       success: false, 
       message: error.message 
     });
@@ -68,15 +69,15 @@ const deleteContact = async (req, res) => {
     const result = await contactService.deleteContactById(userId, contactId);
 
     if (!result) {
-      return res.status(404).json({ message: "Contact not found" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: "Contact not found" });
     }
 
-    res.status(200).json({ 
+    res.status(StatusCodes.OK).json({ 
       success: true, 
       message: "Contact deleted successfully" 
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(StatusCodes.BAD_REQUEST).json({ 
       success: false, 
       message: error.message 
     });

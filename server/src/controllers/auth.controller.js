@@ -29,7 +29,7 @@ const signin = async(req,res) => {
 
     const token = jwt.sign({id : response.userData.id} , process.env.secret_key);
 
-    return res.status(StatusCodes.ACCEPTED).json({
+    return res.status(StatusCodes.OK).json({
         message : "Successfully Login",
         userData : response.userData,
         token : token,
