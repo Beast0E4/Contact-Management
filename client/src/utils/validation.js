@@ -236,16 +236,3 @@ export const validateContactForm = (data) => {
     errors,
   };
 };
-/**
- * Debounce function for search inputs
- * @param {function} func - Function to debounce
- * @param {number} delay - Delay in milliseconds
- * @returns {function} - Debounced function
- */
-export const debounce = (func, delay = 300) => {
-  let timeoutId;
-  return function (...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
-};

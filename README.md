@@ -1,4 +1,4 @@
-# 📇 Contact Dashboard
+# 📇 Contact Manager Pro
 
 A high-performance, full-stack contact management application built with the **MERN** stack. This project features a responsive UI, secure JWT authentication, and full CRUD capabilities for personal contact organization.
 
@@ -107,5 +107,35 @@ npm run dev
 │   └── index.js           # Server entry point
 └── README.md              # Project documentation
 ```
+
+## Database Schema
+
+## User Schema
+
+### 📌 Fields
+
+| Field       | Type     | Description |
+|------------|----------|-------------|
+| `name`     | String   | Required. User's full name |
+| `email`    | String   | Required & unique. Used for authentication |
+| `password` | String   | Required. Minimum length: 8 characters |
+| `createdAt`| Date     | Auto-generated timestamp |
+
+## Contact Schema
+
+### 📌 Fields
+
+| Field        | Type       | Description |
+|-------------|------------|-------------|
+| `user`      | ObjectId   | Reference to the owning User (required) |
+| `name`      | String     | Required. Contact name |
+| `email`     | String     | Required. Contact email |
+| `phone`     | String     | Required. Contact phone number |
+| `company`   | String     | Optional. Company name |
+| `tags`      | String[]   | Optional. Tags for categorization |
+| `notes`     | String     | Optional. Additional notes |
+| `createdAt` | Date       | Auto-generated timestamp |
+
+---
 
 ### Live site - [Contact Dashboard](https://contact-dashboard.onrender.com/dashboard)

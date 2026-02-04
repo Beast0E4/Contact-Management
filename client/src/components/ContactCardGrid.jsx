@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { 
   FaEdit, FaTrash, FaEnvelope, FaPhone, FaBuilding, 
-  FaFilter, FaStickyNote, FaUser, FaTimes
+  FaFilter, FaUser, FaTimes
 } from 'react-icons/fa';
 
-const ContactCardGrid = ({ contacts, onView, onEdit, onDelete, onToggleFavorite }) => {
+const ContactCardGrid = ({ contacts, onView, onEdit, onDelete }) => {
   const [selectedTags, setSelectedTags] = useState([]);
 
-  // Safely get unique tags. The ?. handles cases where tags might be null/undefined
   const allTags = [...new Set(contacts.flatMap(c => c.tags || []))].filter(Boolean).sort();
 
   const toggleTag = (tag) => {
@@ -33,7 +32,7 @@ const ContactCardGrid = ({ contacts, onView, onEdit, onDelete, onToggleFavorite 
 
   return (
     <div className="w-full space-y-8">
-      {/* 1. CONDITIONAL FILTER BAR: Only show if tags exist */}
+
       {allTags.length > 0 && (
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
@@ -131,7 +130,6 @@ const ContactCardGrid = ({ contacts, onView, onEdit, onDelete, onToggleFavorite 
                   </div>
                 )}
 
-                {/* 2. CONDITIONAL TAGS: Only render if contact has tags */}
                 {contact.tags && contact.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-2">
                     {contact.tags.map((tag, i) => (
