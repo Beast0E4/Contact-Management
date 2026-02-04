@@ -1,4 +1,4 @@
-# 📇 Contact Manager Pro
+# 📇 Contact Dashboard
 
 A high-performance, full-stack contact management application built with the **MERN** stack. This project features a responsive UI, secure JWT authentication, and full CRUD capabilities for personal contact organization.
 
