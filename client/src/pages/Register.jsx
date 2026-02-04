@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaUser, FaEnvelope, FaLock, FaUserPlus } from 'react-icons/fa';
 import { registerUser } from '../redux/slices/authSlice';
 import { validateRegisterForm } from '../utils/validation';
-import toast from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +13,8 @@ const Register = () => {
     confirmPassword: ''
   });
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
@@ -22,12 +23,12 @@ const Register = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
+    setServerError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Use the comprehensive validation utility
     const { isValid, errors: validationErrors } = validateRegisterForm(formData);
     
     if (!isValid) {
@@ -42,10 +43,11 @@ const Register = () => {
     }));
     
     if (registerUser.fulfilled.match(result)) {
-      toast.success('Account created! Please login.');
+      // Navigate to login on success without a toast
       navigate('/login');
     } else {
-      toast.error(result.payload || 'Registration failed');
+      // Set server error message locally if registration fails
+      setServerError(result.payload || 'Registration failed. Please try again.');
     }
   };
 
@@ -61,6 +63,12 @@ const Register = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          {serverError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center">
+              {serverError}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
