@@ -28,7 +28,7 @@ import { validateEmail, validatePhone } from '../utils/validation';
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const authState = useSelector((state) => state.auth);
   const { 
     filteredContacts, 
     loading, 
@@ -188,7 +188,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Contact Manager</h1>
-                <p className="text-sm text-gray-600">Welcome, {user?.name}</p>
+                <p className="text-sm text-gray-600">Welcome, {authState.data?.name}</p>
               </div>
             </div>
             
