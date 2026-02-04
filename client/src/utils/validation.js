@@ -29,6 +29,7 @@ export const validatePhone = (phone) => {
 
 /**
  * Password strength validation
+ * Requirements: Uppercase, Lowercase, Number, Special Character, and min length 8.
  * @param {string} password - Password to validate
  * @returns {object} - { isValid: boolean, message: string, strength: string }
  */
@@ -44,37 +45,107 @@ export const validatePassword = (password) => {
     return result;
   }
 
-  if (password.length < 6) {
-    result.message = 'Password must be at least 6 characters';
-    return result;
-  }
-
-  if (password.length < 8) {
-    result.isValid = true;
-    result.strength = 'weak';
-    result.message = 'Weak password';
-    return result;
-  }
-
-  // Check for medium strength
-  const hasLetter = /[a-zA-Z]/.test(password);
+  // Check for individual requirements
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
   const hasNumber = /\d/.test(password);
   const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const isLongEnough = password.length >= 8;
 
-  if (password.length >= 8 && hasLetter && hasNumber) {
-    result.isValid = true;
-    result.strength = 'medium';
-    result.message = 'Medium strength password';
+  if (!isLongEnough) {
+    result.message = 'Password must be at least 8 characters';
+    return result;
   }
 
-  // Check for strong password
-  if (password.length >= 10 && hasLetter && hasNumber && hasSpecial) {
-    result.isValid = true;
-    result.strength = 'strong';
-    result.message = 'Strong password';
+  if (!hasUppercase) {
+    result.message = 'Password must contain at least one uppercase letter';
+    return result;
   }
 
+  if (!hasLowercase) {
+    result.message = 'Password must contain at least one lowercase letter';
+    return result;
+  }
+
+  if (!hasNumber) {
+    result.message = 'Password must contain at least one number';
+    return result;
+  }
+
+  if (!hasSpecial) {
+    result.message = 'Password must contain at least one special character';
+    return result;
+  }
+
+  // If all checks pass
+  result.isValid = true;
+  result.message = 'Strong password';
+  result.strength = 'strong';
+  
   return result;
+};
+
+/**
+ * Updated Login validation to reflect minimum length
+ */
+export const validateLoginForm = (data) => {
+  const errors = {};
+
+  if (isEmpty(data.email)) {
+    errors.email = 'Email is required';
+  } else if (!validateEmail(data.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+
+  if (isEmpty(data.password)) {
+    errors.password = 'Password is required';
+  } 
+  // We don't necessarily need the full complex validation on login, 
+  // but we should check minimum length.
+  else if (data.password.length < 8) {
+    errors.password = 'Password must be at least 8 characters';
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
+/**
+ * Updated Register validation to use the new complex password logic
+ */
+export const validateRegisterForm = (data) => {
+  const errors = {};
+
+  if (isEmpty(data.name)) {
+    errors.name = 'Name is required';
+  } else if (!validateName(data.name)) {
+    errors.name = 'Please enter a valid name';
+  }
+
+  if (isEmpty(data.email)) {
+    errors.email = 'Email is required';
+  } else if (!validateEmail(data.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+
+  // Complex Password validation
+  const passwordValidation = validatePassword(data.password);
+  if (!passwordValidation.isValid) {
+    errors.password = passwordValidation.message;
+  }
+
+  if (isEmpty(data.confirmPassword)) {
+    errors.confirmPassword = 'Please confirm your password';
+  } else if (data.password !== data.confirmPassword) {
+    errors.confirmPassword = 'Passwords do not match';
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
 };
 
 /**
@@ -165,76 +236,6 @@ export const validateContactForm = (data) => {
     errors,
   };
 };
-
-/**
- * Validate login form data
- * @param {object} data - Login form data
- * @returns {object} - { isValid: boolean, errors: object }
- */
-export const validateLoginForm = (data) => {
-  const errors = {};
-
-  if (isEmpty(data.email)) {
-    errors.email = 'Email is required';
-  } else if (!validateEmail(data.email)) {
-    errors.email = 'Please enter a valid email address';
-  }
-
-  if (isEmpty(data.password)) {
-    errors.password = 'Password is required';
-  } else if (data.password.length < 6) {
-    errors.password = 'Password must be at least 6 characters';
-  }
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors,
-  };
-};
-
-/**
- * Validate registration form data
- * @param {object} data - Registration form data
- * @returns {object} - { isValid: boolean, errors: object }
- */
-export const validateRegisterForm = (data) => {
-  const errors = {};
-
-  // Name validation
-  if (isEmpty(data.name)) {
-    errors.name = 'Name is required';
-  } else if (!validateName(data.name)) {
-    errors.name = 'Please enter a valid name';
-  } else if (data.name.length < 2) {
-    errors.name = 'Name must be at least 2 characters';
-  }
-
-  // Email validation
-  if (isEmpty(data.email)) {
-    errors.email = 'Email is required';
-  } else if (!validateEmail(data.email)) {
-    errors.email = 'Please enter a valid email address';
-  }
-
-  // Password validation
-  const passwordValidation = validatePassword(data.password);
-  if (!passwordValidation.isValid) {
-    errors.password = passwordValidation.message;
-  }
-
-  // Confirm password validation
-  if (isEmpty(data.confirmPassword)) {
-    errors.confirmPassword = 'Please confirm your password';
-  } else if (data.password !== data.confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match';
-  }
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors,
-  };
-};
-
 /**
  * Debounce function for search inputs
  * @param {function} func - Function to debounce
